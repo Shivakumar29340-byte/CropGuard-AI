@@ -1,0 +1,135 @@
+{
+  "contractName": "CropGuardRecords",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "recordHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "RecordRegistered",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getRecord",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "recordHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "exists",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "recordHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "registerRecord",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "expectedHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "verifyRecord",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "exists",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "valid",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "storedHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052348015600f57600080fd5b50600080546001600160a01b031916331790556103c8806100316000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c806303e9e609146100515780637ab47a70146100c1578063871da2de146100d65780638da5cb5b1461010b575b600080fd5b61009f61005f366004610357565b600081815260016020818152604092839020835160608101855281548082529382015492810183905260029091015460ff16151593018390529093909250565b6040805193845260208401929092521515908201526060015b60405180910390f35b6100d46100cf366004610370565b610136565b005b6100e96100e4366004610370565b610301565b60408051941515855292151560208501529183015260608201526080016100b8565b60005461011e906001600160a01b031681565b6040516001600160a01b0390911681526020016100b8565b6000546001600160a01b031633146101955760405162461bcd60e51b815260206004820152601f60248201527f4f6e6c79206f776e65722063616e207265676973746572207265636f7264730060448201526064015b60405180910390fd5b600082116101d95760405162461bcd60e51b8152602060048201526011602482015270125b9d985b1a59081c9958dbdc99081251607a1b604482015260640161018c565b8061021c5760405162461bcd60e51b8152602060048201526013602482015272092dcecc2d8d2c840e4cac6dee4c840d0c2e6d606b1b604482015260640161018c565b60008281526001602052604090206002015460ff161561027e5760405162461bcd60e51b815260206004820152601960248201527f5265636f726420616c7265616479207265676973746572656400000000000000604482015260640161018c565b604080516060810182528281524260208083018281526001848601818152600089815282855287902095518655915190850155516002909301805460ff19169315159390931790925582518481529182015283917ff57a08d1af0f3af6ea459195b0bebdaa798b576f3f5a24001bdd634a54a9e28f910160405180910390a25050565b6000828152600160208181526040808420815160608101835281548082529482015493810184905260029091015460ff161580159282018390529194939291859061034b57508583145b93505092959194509250565b60006020828403121561036957600080fd5b5035919050565b6000806040838503121561038357600080fd5b5050803592602090910135915056fea264697066735822122017724aeb86f769a46a54ca64a0ad7c3d49d100ef29607e349eabaa2abccff20964736f6c63430008260033"
+}

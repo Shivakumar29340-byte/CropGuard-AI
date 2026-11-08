@@ -1,0 +1,6 @@
+{
+    "rpc_url": "http://127.0.0.1:7547",
+    "chain_id": 1337,
+    "contract_address": "YOUR_CONTRACT_ADDRESS",
+    "deployer_address": "YOUR_DEPLOYER_ADDRESS"
+}
