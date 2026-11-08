@@ -1,0 +1,372 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Verify record | CropGuard AI</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg cg-nav sticky-top">
+<div class="container">
+
+<a class="navbar-brand" href="index.html">
+<i class="bi bi-flower2"></i> CropGuard AI
+</a>
+
+<button class="navbar-toggler" type="button"
+data-bs-toggle="collapse"
+data-bs-target="#nav"
+aria-controls="nav"
+aria-expanded="false"
+aria-label="Toggle navigation">
+
+<span class="navbar-toggler-icon"></span>
+</button>
+
+<div class="collapse navbar-collapse" id="nav">
+
+<ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+
+<li class="nav-item">
+<a class="nav-link" href="index.html">Home</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="about.html">About</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="detection.html">Detect disease</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="history.html">History</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link active" href="blockchain.html">Verify record</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="contact.html">Contact</a>
+</li>
+
+<li class="nav-item ms-lg-2">
+<a class="btn btn-outline-success btn-sm" href="login.html">Log in</a>
+</li>
+
+<li class="nav-item">
+<a class="btn btn-success btn-sm" href="register.html">Register</a>
+</li>
+
+</ul>
+</div>
+</div>
+</nav>
+
+
+<section class="section">
+<div class="container">
+
+<div class="row g-4">
+
+<div class="col-lg-3">
+
+<div class="list-group cg-side">
+
+<a class="list-group-item list-group-item-action" href="dashboard.html">
+<i class="bi bi-grid"></i> Dashboard
+</a>
+
+<a class="list-group-item list-group-item-action" href="detection.html">
+<i class="bi bi-camera"></i> Detect disease
+</a>
+
+<a class="list-group-item list-group-item-action" href="history.html">
+<i class="bi bi-clock-history"></i> History
+</a>
+
+<a class="list-group-item list-group-item-action active" href="blockchain.html">
+<i class="bi bi-shield-check"></i> Verify record
+</a>
+
+<a class="list-group-item list-group-item-action" href="admin.html">
+<i class="bi bi-people"></i> Admin
+</a>
+
+</div>
+</div>
+
+
+<div class="col-lg-9">
+
+<h1>Verify a record</h1>
+
+<p>
+Enter a detection Record ID or record hash to check whether
+it was registered on the Ganache blockchain.
+</p>
+
+<div class="alert alert-info small" role="status">
+<strong>Live blockchain verification:</strong>
+Your record hash will be checked against the deployed
+CropGuard Solidity smart contract.
+</div>
+
+
+<div class="cg-card">
+
+<form id="verifyForm" class="row g-2">
+
+<div class="col-md-9">
+
+<label class="visually-hidden" for="recordId">
+Record ID or hash
+</label>
+
+<input
+class="form-control"
+id="recordId"
+name="record_id"
+placeholder="Enter Record ID (example: 11) or SHA-256 hash"
+required
+autocomplete="off"
+>
+
+</div>
+
+<div class="col-md-3">
+
+<button
+class="btn btn-success w-100"
+id="verifyButton"
+type="submit">
+
+<i class="bi bi-shield-check"></i>
+Verify
+
+</button>
+
+</div>
+</form>
+
+
+<div id="verifyMsg" class="mt-3" aria-live="polite"></div>
+
+</div>
+</div>
+
+</div>
+</div>
+</section>
+
+
+<footer class="cg-footer">
+
+<div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+
+<span>
+<i class="bi bi-flower2"></i>
+CropGuard AI &mdash; final-year engineering project
+</span>
+
+<span>
+<a href="about.html">About</a> &nbsp;
+<a href="contact.html">Contact</a> &nbsp;
+<a href="admin.html">Admin</a>
+</span>
+
+</div>
+</footer>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/main.js"></script>
+
+<script>
+(function () {
+
+    const form = document.getElementById("verifyForm");
+    const input = document.getElementById("recordId");
+    const message = document.getElementById("verifyMsg");
+    const button = document.getElementById("verifyButton");
+
+    function showMessage(type, text) {
+        message.replaceChildren();
+
+        const box = document.createElement("div");
+        box.className = "alert alert-" + type;
+        box.textContent = text;
+
+        message.appendChild(box);
+    }
+
+    function addDetail(container, label, value) {
+        const paragraph = document.createElement("p");
+        paragraph.className = "mb-2";
+
+        const strong = document.createElement("strong");
+        strong.textContent = label + ": ";
+
+        const span = document.createElement("span");
+        span.textContent =
+            value === null || value === undefined || value === ""
+                ? "Not available"
+                : String(value);
+
+        paragraph.appendChild(strong);
+        paragraph.appendChild(span);
+        container.appendChild(paragraph);
+    }
+
+    form.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        const recordId = input.value.trim();
+
+        if (!recordId) {
+            showMessage("warning", "Please enter a Record ID or hash.");
+            return;
+        }
+
+       if (typeof CG === "undefined" || typeof CG.api !== "function") {
+            showMessage(
+                "danger",
+                "The CropGuard API helper did not load. Check web/js/main.js."
+            );
+            return;
+        }
+
+        button.disabled = true;
+        button.innerHTML =
+            '<span class="spinner-border spinner-border-sm"></span> Verifying...';
+
+        showMessage(
+            "info",
+            "Connecting to Ganache and verifying your record..."
+        );
+
+        try {
+
+            const result = await CG.api("/blockchain/verify", {
+                method: "POST",
+                auth: true,
+                body: {
+                    record_id: recordId
+                }
+            });
+
+            message.replaceChildren();
+
+            const status = document.createElement("div");
+
+            status.className = result.verified
+                ? "alert alert-success"
+                : "alert alert-warning";
+
+            const heading = document.createElement("h5");
+
+            heading.textContent = result.verified
+                ? "✓ Blockchain verification successful"
+                : "⚠ Blockchain verification not confirmed";
+
+            const description = document.createElement("p");
+            description.className = "mb-0";
+            description.textContent = result.message;
+
+            status.appendChild(heading);
+            status.appendChild(description);
+
+            message.appendChild(status);
+
+            const details = document.createElement("div");
+            details.className = "card p-3 mt-3";
+
+            addDetail(details, "Record ID", result.record_id);
+            addDetail(details, "Crop", result.crop);
+            addDetail(details, "Disease", result.disease);
+
+            addDetail(
+                details,
+                "Blockchain registered",
+                result.blockchain_exists ? "Yes" : "No"
+            );
+
+            addDetail(
+                details,
+                "Verification result",
+                result.verified ? "Genuine record" : "Not verified"
+            );
+
+            addDetail(
+                details,
+                "Database record hash",
+                result.record_hash
+            );
+
+            addDetail(
+                details,
+                "Blockchain stored hash",
+                result.stored_hash
+            );
+
+            addDetail(
+                details,
+                "Transaction hash",
+                result.blockchain_tx
+            );
+
+            addDetail(
+                details,
+                "Blockchain timestamp",
+                result.blockchain_timestamp
+            );
+
+            addDetail(
+                details,
+                "Chain ID",
+                result.chain_id
+            );
+
+            addDetail(
+                details,
+                "Contract address",
+                result.contract_address
+            );
+
+            message.appendChild(details);
+
+        } catch (error) {
+
+            showMessage(
+                "danger",
+                error.message || "Verification failed. Please try again."
+            );
+
+        } finally {
+
+            button.disabled = false;
+            button.innerHTML =
+                '<i class="bi bi-shield-check"></i> Verify';
+
+        }
+
+    });
+
+})();
+</script>
+
+</body>
+</html>

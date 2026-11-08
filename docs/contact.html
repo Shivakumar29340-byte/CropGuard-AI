@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact | CropGuard AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+</head>
+<body class="">
+<nav class="navbar navbar-expand-lg cg-nav sticky-top">
+<div class="container">
+<a class="navbar-brand" href="index.html"><i class="bi bi-flower2"></i> CropGuard AI</a>
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+<div class="collapse navbar-collapse" id="nav">
+<ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1"><li class="nav-item"><a class="nav-link" href="index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="about.html">About</a></li><li class="nav-item"><a class="nav-link" href="detection.html">Detect disease</a></li><li class="nav-item"><a class="nav-link" href="history.html">History</a></li><li class="nav-item"><a class="nav-link" href="blockchain.html">Verify record</a></li><li class="nav-item"><a class="nav-link active" href="contact.html">Contact</a></li>
+<li class="nav-item ms-lg-2"><a class="btn btn-outline-success btn-sm" href="login.html">Log in</a></li>
+<li class="nav-item"><a class="btn btn-success btn-sm" href="register.html">Register</a></li>
+</ul></div></div></nav>
+
+<section class="section"><div class="container narrow"><h1>Contact</h1>
+<p>Questions about the project? Send a message.</p><div class="alert alert-warning small" role="status"><strong>Phase 1:</strong> this page is the interface only. It is not connected to the backend yet, so nothing here is saved or predicted.</div>
+<form id="contactForm" class="cg-card" novalidate>
+<div class="mb-3"><label class="form-label" for="cname">Name</label><input class="form-control" id="cname" required></div>
+<div class="mb-3"><label class="form-label" for="cemail">Email</label><input class="form-control" id="cemail" type="email" required></div>
+<div class="mb-3"><label class="form-label" for="cmsg">Message</label><textarea class="form-control" id="cmsg" rows="5" required></textarea></div>
+<button class="btn btn-success" type="submit">Send message</button><p id="cform-msg" class="small mt-3 mb-0" aria-live="polite"></p></form>
+</div></section>
+<footer class="cg-footer"><div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+<span><i class="bi bi-flower2"></i> CropGuard AI &mdash; final-year engineering project</span>
+<span><a href="about.html">About</a> &nbsp; <a href="contact.html">Contact</a> &nbsp; <a href="admin.html">Admin</a></span></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/main.js"></script>
+<script>CG.authForm('contactForm');</script>
+</body></html>

@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Detect Disease | CropGuard AI</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <link href="css/style.css" rel="stylesheet">
+
+    <style>
+        .cg-upload-box {
+            border: 2px dashed #54a66a;
+            border-radius: 12px;
+            padding: 35px 15px;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s ease;
+        }
+
+        .cg-upload-box:hover,
+        .cg-upload-box.drag {
+            background: #eef8ef;
+        }
+
+        .cg-upload-box i {
+            font-size: 35px;
+            color: #278a46;
+        }
+
+        #preview {
+            max-height: 350px;
+            width: 100%;
+            object-fit: contain;
+        }
+
+        #resultBox {
+            overflow-wrap: anywhere;
+        }
+
+        .cg-result-item {
+            margin-bottom: 15px;
+        }
+
+        .cg-result-item strong {
+            color: #16834a;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVIGATION -->
+<nav class="navbar navbar-expand-lg cg-nav sticky-top">
+    <div class="container">
+
+        <a class="navbar-brand" href="index.html">
+            <i class="bi bi-flower2"></i> CropGuard AI
+        </a>
+
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#nav"
+                aria-controls="nav"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="nav">
+
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Home</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="about.html">About</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link active" href="detection.html">Detect disease</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="history.html">History</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="blockchain.html">Verify record</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="contact.html">Contact</a>
+                </li>
+
+                <li class="nav-item ms-lg-2">
+                    <a class="btn btn-outline-success btn-sm" href="login.html">Log in</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="btn btn-success btn-sm" href="register.html">Register</a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<!-- DETECTION SECTION -->
+<section class="section">
+
+    <div class="container">
+
+        <div class="row g-4">
+
+            <!-- SIDEBAR -->
+            <div class="col-lg-3">
+
+                <div class="list-group cg-side">
+
+                    <a class="list-group-item list-group-item-action"
+                       href="dashboard.html">
+                        <i class="bi bi-grid"></i> Dashboard
+                    </a>
+
+                    <a class="list-group-item list-group-item-action active"
+                       href="detection.html">
+                        <i class="bi bi-camera"></i> Detect disease
+                    </a>
+
+                    <a class="list-group-item list-group-item-action"
+                       href="history.html">
+                        <i class="bi bi-clock-history"></i> History
+                    </a>
+
+                    <a class="list-group-item list-group-item-action"
+                       href="blockchain.html">
+                        <i class="bi bi-shield-check"></i> Verify record
+                    </a>
+
+                    <a class="list-group-item list-group-item-action"
+                       href="admin.html">
+                        <i class="bi bi-people"></i> Admin
+                    </a>
+
+                </div>
+            </div>
+
+
+            <!-- MAIN CONTENT -->
+            <div class="col-lg-9">
+
+                <h1>Detect crop disease</h1>
+
+                <p class="text-muted mb-4">
+                    Upload a crop leaf image and let CropGuard AI
+                    identify possible diseases using artificial intelligence.
+                </p>
+
+
+                <div class="row g-4">
+
+                    <!-- IMAGE UPLOAD -->
+                    <div class="col-md-6">
+
+                        <div class="cg-card">
+
+                            <label for="leafInput"
+                                   class="cg-upload-box"
+                                   id="dropzone">
+
+                                <i class="bi bi-cloud-arrow-up"></i>
+
+                                <strong>Choose or drop a leaf photo</strong>
+
+                                <span>JPG or PNG, up to 5 MB</span>
+
+                            </label>
+
+
+                            <input
+                                type="file"
+                                id="leafInput"
+                                accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                                class="visually-hidden"
+                            >
+
+
+                            <!-- IMAGE PREVIEW -->
+                            <div id="previewWrap" class="d-none mt-3">
+
+                                <img
+                                    id="preview"
+                                    class="img-fluid rounded"
+                                    alt="Uploaded crop leaf preview"
+                                >
+
+                            </div>
+
+
+                            <!-- ERROR MESSAGE -->
+                            <p
+                                id="fileMsg"
+                                class="small text-danger mt-2 mb-0"
+                                role="alert">
+                            </p>
+
+
+                            <!-- BUTTONS -->
+                            <div class="d-flex gap-2 mt-3">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-success"
+                                    id="analyzeBtn"
+                                    disabled>
+
+                                    <i class="bi bi-search"></i>
+                                    Analyze leaf
+
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    id="clearBtn"
+                                    disabled>
+
+                                    Clear
+
+                                </button>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <!-- AI RESULT -->
+                    <div class="col-md-6">
+
+                        <div
+                            class="cg-card h-100"
+                            id="resultBox"
+                            aria-live="polite">
+
+                            <div class="cg-empty">
+
+                                <i class="bi bi-search"></i>
+
+                                <h3>No result yet</h3>
+
+                                <p>
+                                    Upload a crop leaf photo and click
+                                    Analyze leaf to see the AI prediction.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- INFORMATION -->
+                <div class="alert alert-light border mt-4 small">
+
+                    <i class="bi bi-info-circle text-success"></i>
+
+                    AI predictions are provided as guidance.
+                    Confirm uncertain results with a local agricultural
+                    expert before applying pesticides.
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer class="cg-footer">
+
+    <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+
+        <span>
+            <i class="bi bi-flower2"></i>
+            CropGuard AI — Final-year engineering project
+        </span>
+
+        <span>
+            <a href="about.html">About</a>
+            &nbsp;
+            <a href="contact.html">Contact</a>
+            &nbsp;
+            <a href="admin.html">Admin</a>
+        </span>
+
+    </div>
+
+</footer>
+
+
+<!-- JAVASCRIPT -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="js/main.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        if (typeof CG !== "undefined" &&
+            typeof CG.detection === "function") {
+
+            CG.detection();
+
+        } else {
+
+            console.error("CropGuard detection JavaScript not loaded.");
+
+        }
+
+    });
+</script>
+
+</body>
+</html>
