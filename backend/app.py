@@ -185,7 +185,6 @@ def create_app(overrides=None):
         app.config.update(overrides)
 
     # Number of disease categories from trained AI model.
-    # Used by the Admin Dashboard statistics API.
     app.config["DISEASE_CLASSES"] = len(class_names)
 
     # CORS CONFIGURATION
@@ -423,9 +422,14 @@ def create_app(overrides=None):
 # 7. START SERVER
 # ==========================================
 
-if __name__ == "__main__":
+# IMPORTANT:
+# Keep this outside the __main__ block.
+# Gunicorn needs this module-level variable.
 
-    application = create_app()
+application = create_app()
+
+
+if __name__ == "__main__":
 
     application.run(
         host=Config.HOST,
