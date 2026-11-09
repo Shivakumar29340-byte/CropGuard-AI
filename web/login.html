@@ -1,34 +1,315 @@
 
-<form id="authForm" novalidate>
-    <div class="mb-3">
-        <label class="form-label" for="email">Email</label>
-        <input
-            class="form-control"
-            id="email"
-            type="email"
-            autocomplete="email"
-            required
-        >
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <div class="mb-2">
-        <label class="form-label" for="password">Password</label>
-        <input
-            class="form-control"
-            id="password"
-            type="password"
-            autocomplete="current-password"
-            required
-        >
-    </div>
+    <title>Login | CropGuard AI</title>
 
-    <div class="text-end mb-3">
-        <a href="forgot-password.html" class="small text-success">
-            Forgot Password?
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        body {
+            font-family: Georgia, serif;
+            background: #eef5e8;
+            color: #173d25;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px solid #dce8d7;
+        }
+
+        .navbar-brand {
+            color: #174d2b;
+            font-weight: bold;
+        }
+
+        .navbar-brand:hover {
+            color: #26733c;
+        }
+
+        .nav-link {
+            color: #173d25;
+            font-size: 14px;
+        }
+
+        .nav-link:hover {
+            color: #198754;
+        }
+
+        .login-section {
+            min-height: 320px;
+            padding: 35px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            padding: 25px 21px;
+            border: 1px solid #d6e3d1;
+            border-radius: 10px;
+        }
+
+        .login-card h1 {
+            font-size: 30px;
+            font-weight: bold;
+            color: #164329;
+            margin-bottom: 10px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .form-control {
+            border: 1px solid #d6dfd5;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-control:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.15rem rgba(25,135,84,.15);
+        }
+
+        .btn-success {
+            background: #286d3c;
+            border-color: #286d3c;
+        }
+
+        .btn-success:hover {
+            background: #1d542e;
+            border-color: #1d542e;
+        }
+
+        .forgot-link {
+            color: #198754;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        .register-link {
+            color: #198754;
+        }
+
+        .footer {
+            background: #153d25;
+            color: #ffffff;
+            padding: 15px 0;
+            font-size: 12px;
+        }
+
+        .footer a {
+            color: #ffffff;
+            margin-left: 12px;
+        }
+
+        #authMessage {
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVIGATION -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+
+        <a class="navbar-brand" href="index.html">
+            🌱 CropGuard AI
         </a>
+
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#mainNavbar"
+            aria-controls="mainNavbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Home</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="about.html">About</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="detect.html">Detect disease</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="history.html">History</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="verify.html">Verify record</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="contact.html">Contact</a>
+                </li>
+
+                <li class="nav-item ms-lg-2">
+                    <a class="btn btn-outline-success btn-sm active"
+                       href="login.html">
+                        Log in
+                    </a>
+                </li>
+
+                <li class="nav-item ms-lg-1">
+                    <a class="btn btn-success btn-sm"
+                       href="register.html">
+                        Register
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<!-- LOGIN SECTION -->
+<main class="login-section">
+
+    <div class="login-card">
+
+        <h1>Log in</h1>
+
+        <form id="authForm" novalidate>
+
+            <div class="mb-3">
+
+                <label class="form-label" for="email">
+                    Email
+                </label>
+
+                <input
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    required
+                >
+
+            </div>
+
+            <div class="mb-2">
+
+                <label class="form-label" for="password">
+                    Password
+                </label>
+
+                <input
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    required
+                >
+
+            </div>
+
+            <!-- FORGOT PASSWORD LINK -->
+            <div class="text-end mb-3">
+
+                <a
+                    href="forgot-password.html"
+                    class="forgot-link"
+                >
+                    Forgot Password?
+                </a>
+
+            </div>
+
+            <button
+                class="btn btn-success w-100"
+                type="submit"
+            >
+                Log in
+            </button>
+
+            <div
+                id="authMessage"
+                class="mt-3"
+                role="status"
+                aria-live="polite"
+            ></div>
+
+        </form>
+
+        <p class="mt-3 mb-0" style="font-size:13px;">
+            New here?
+            <a href="register.html" class="register-link">
+                Create an account
+            </a>
+        </p>
+
     </div>
 
-    <button class="btn btn-success w-100" type="submit">
-        Log in
-    </button>
-</form>
+</main>
+
+
+<!-- FOOTER -->
+<footer class="footer">
+
+    <div class="container d-flex justify-content-between align-items-center flex-wrap">
+
+        <span>
+            🌱 CropGuard AI — final-year engineering project
+        </span>
+
+        <div>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+            <a href="admin.html">Admin</a>
+        </div>
+
+    </div>
+
+</footer>
+
+
+<!-- JAVASCRIPT -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="js/main.js"></script>
+
+<script>
+    if (window.CG && typeof CG.authForm === "function") {
+        CG.authForm("authForm");
+    } else {
+        console.error("CropGuard authentication JavaScript did not load.");
+    }
+</script>
+
+</body>
+</html>
