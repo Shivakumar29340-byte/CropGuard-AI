@@ -14,15 +14,14 @@ class Config:
         os.path.join(BASE_DIR, "cropguard.db")
     )
 
-    # Login token validity (days)
     TOKEN_DAYS = 7
 
     # Maximum request size: 6 MB
-    # Supports image uploads up to 5 MB plus request overhead.
     MAX_CONTENT_LENGTH = 6 * 1024 * 1024
 
     # Allowed frontend websites
     CORS_ORIGINS = [
+        "https://shivakumar29340-byte.github.io",
         "http://localhost:8000",
         "http://127.0.0.1:8000",
         "http://localhost:5500",
@@ -41,11 +40,8 @@ class Config:
     ]
 
     # Backend server settings
-    HOST = "127.0.0.1"
-    PORT = 5000
+    HOST = "0.0.0.0"
+    PORT = int(os.environ.get("PORT", 5000))
 
-    # Debug mode
-    DEBUG = os.environ.get(
-        "CROPGUARD_DEBUG",
-        "1"
-    ) == "1"
+    # Debug mode disabled by default for deployment
+    DEBUG = os.environ.get("CROPGUARD_DEBUG", "0") == "1"
