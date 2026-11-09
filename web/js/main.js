@@ -1,25 +1,36 @@
-
 /* =====================================================
    CROPGUARD AI - MAIN JAVASCRIPT
-   Authentication + AI Detection + Database + History
-   + Farmer Dashboard + Blockchain API
+   Image Upload + AI Prediction + Authentication + History
 ===================================================== */
 
 const CG = {
+
     MAX_BYTES: 5 * 1024 * 1024,
+
     TYPES: ["image/jpeg", "image/png"],
 
+    // Deployed Render backend
     API_BASE: localStorage.getItem("cg_api") ||
-        "http://127.0.0.1:5000/api",
+        "https://cropguard-ai-0a6n.onrender.com/api",
+
+    // -------------------------------------------------
+    // MESSAGE DISPLAY
+    // -------------------------------------------------
 
     notice(el, msg, ok) {
         if (!el) return;
+
         el.textContent = msg;
         el.className = "small mt-3 " +
             (ok ? "text-success" : "text-danger");
     },
 
+    // -------------------------------------------------
+    // USER SESSION
+    // -------------------------------------------------
+
     session: {
+
         token() {
             return localStorage.getItem("cg_token");
         },
@@ -27,7 +38,7 @@ const CG = {
         user() {
             try {
                 return JSON.parse(localStorage.getItem("cg_user"));
-            } catch (error) {
+            } catch (e) {
                 return null;
             }
         },
@@ -43,7 +54,12 @@ const CG = {
         }
     },
 
+    // -------------------------------------------------
+    // API CLIENT
+    // -------------------------------------------------
+
     async api(path, { method = "GET", body, auth = false } = {}) {
+
         const headers = {};
 
         if (body) {
@@ -65,7 +81,7 @@ const CG = {
             });
         } catch (error) {
             throw new Error(
-                "Cannot connect to backend. Start Flask using python app.py."
+                "Cannot connect to the CropGuard backend. Please try again."
             );
         }
 
@@ -74,7 +90,7 @@ const CG = {
         try {
             data = await response.json();
         } catch (error) {
-            // Ignore invalid JSON.
+            // Ignore invalid JSON response.
         }
 
         if (response.status === 401 && auth) {
@@ -82,25 +98,32 @@ const CG = {
         }
 
         if (!response.ok) {
-            const apiError = new Error(
-                data.error || data.message || "Request failed."
-            );
-            apiError.status = response.status;
-            throw apiError;
+            throw new Error(data.error || "Request failed.");
         }
 
         return data;
     },
 
+    // -------------------------------------------------
+    // LOGIN PROTECTION
+    // -------------------------------------------------
+
     requireLogin() {
+
         if (!CG.session.token()) {
             window.location.replace("login.html");
             return false;
         }
+
         return true;
     },
 
+    // -------------------------------------------------
+    // NAVIGATION LOGIN STATUS
+    // -------------------------------------------------
+
     navAuth() {
+
         const loginLink = document.querySelector(
             '.cg-nav a[href="login.html"]'
         );
@@ -114,50 +137,65 @@ const CG = {
         }
 
         const user = CG.session.user() || {};
+
         const firstName = String(user.name || "Farmer").split(" ")[0];
 
         registerLink.parentElement.remove();
 
         const li = loginLink.parentElement;
+
         li.innerHTML = "";
 
         const hi = document.createElement("a");
+
         hi.className = "nav-link d-inline";
         hi.href = "dashboard.html";
         hi.textContent = "Hi, " + firstName;
 
         const logout = document.createElement("button");
+
         logout.className = "btn btn-outline-success btn-sm ms-2";
         logout.type = "button";
         logout.textContent = "Log out";
 
         logout.addEventListener("click", async () => {
+
             try {
                 await CG.api("/auth/logout", {
                     method: "POST",
                     auth: true
                 });
             } catch (error) {
-                // Clear local session even if logout fails.
+                // Clear local session even if logout API fails.
             }
 
             CG.session.clear();
+
             window.location.href = "index.html";
         });
 
         li.append(hi, logout);
     },
 
+    // -------------------------------------------------
+    // LOGIN / REGISTER / CONTACT FORMS
+    // -------------------------------------------------
+
     authForm(id) {
+
         const form = document.getElementById(id);
+
         if (!form) return;
 
         const isAuth = id === "authForm";
+
         const isRegister =
             isAuth && !!form.querySelector("#confirm");
 
         form.addEventListener("submit", async (event) => {
+
             event.preventDefault();
+
             form.classList.add("was-validated");
 
             const val = selector => {
@@ -178,18 +216,21 @@ const CG = {
 
             if (!form.checkValidity()) {
                 message = "Please fill in every field correctly.";
-            } else if (
-                isRegister && val("#password").length < 8
-            ) {
+            }
+
+            else if (isRegister && val("#password").length < 8) {
                 message = "Password must be at least 8 characters.";
-            } else if (
+            }
+
+            else if (
                 isRegister &&
                 !(/[A-Za-z]/.test(val("#password")) &&
-                  /\d/.test(val("#password")))
+                /\d/.test(val("#password")))
             ) {
-                message =
-                    "Password needs at least one letter and one number.";
-            } else if (
+                message = "Password needs at least one letter and one number.";
+            }
+
+            else if (
                 isRegister &&
                 val("#password") !== val("#confirm")
             ) {
@@ -208,14 +249,14 @@ const CG = {
                 );
             }
 
-            const button = form.querySelector(
-                'button[type="submit"]'
-            );
+            const button = form.querySelector('button[type="submit"]');
 
             if (button) button.disabled = true;
 
             try {
+
                 if (isRegister) {
+
                     await CG.api("/auth/register", {
                         method: "POST",
                         body: {
@@ -236,6 +277,7 @@ const CG = {
                     }, 1200);
 
                 } else {
+
                     const result = await CG.api("/auth/login", {
                         method: "POST",
                         body: {
@@ -245,17 +287,25 @@ const CG = {
                     });
 
                     CG.session.save(result.token, result.user);
+
                     window.location.href = "dashboard.html";
                 }
 
             } catch (error) {
+
                 CG.notice(output, error.message, false);
+
                 if (button) button.disabled = false;
             }
         });
     },
 
+    // =================================================
+    // CROP DISEASE DETECTION
+    // =================================================
+
     detection() {
+
         const input = document.getElementById("leafInput");
         const drop = document.getElementById("dropzone");
         const wrap = document.getElementById("previewWrap");
@@ -265,8 +315,7 @@ const CG = {
         const clr = document.getElementById("clearBtn");
         const box = document.getElementById("resultBox");
 
-        if (!input || !drop || !wrap || !img ||
-            !msg || !go || !clr || !box) {
+        if (!input || !drop || !wrap || !img || !msg || !go || !clr || !box) {
             console.error("CropGuard detection elements are missing.");
             return;
         }
@@ -274,9 +323,15 @@ const CG = {
         let selectedFile = null;
         let objectUrl = null;
 
+        // ---------------------------------------------
+        // RESET UPLOAD
+        // ---------------------------------------------
+
         const reset = () => {
+
             input.value = "";
             selectedFile = null;
+
             wrap.classList.add("d-none");
 
             if (objectUrl) {
@@ -285,8 +340,10 @@ const CG = {
             }
 
             img.removeAttribute("src");
+
             go.disabled = true;
             clr.disabled = true;
+
             msg.textContent = "";
 
             box.innerHTML = `
@@ -298,8 +355,14 @@ const CG = {
             `;
         };
 
+        // ---------------------------------------------
+        // LOAD SELECTED IMAGE
+        // ---------------------------------------------
+
         const load = (file) => {
+
             msg.textContent = "";
+
             if (!file) return;
 
             const isAllowedType =
@@ -307,28 +370,39 @@ const CG = {
                 /\.(jpe?g|png)$/i.test(file.name || "");
 
             if (!isAllowedType) {
+
                 selectedFile = null;
                 go.disabled = true;
+
                 msg.textContent =
                     "Unsupported image. Please select JPG or PNG.";
+
                 return;
             }
 
             if (file.size > CG.MAX_BYTES) {
+
                 selectedFile = null;
                 go.disabled = true;
+
                 msg.textContent =
                     "Image is larger than 5 MB. Select a smaller image.";
+
                 return;
             }
 
             selectedFile = file;
 
-            if (objectUrl) URL.revokeObjectURL(objectUrl);
+            if (objectUrl) {
+                URL.revokeObjectURL(objectUrl);
+            }
 
             objectUrl = URL.createObjectURL(file);
+
             img.src = objectUrl;
+
             wrap.classList.remove("d-none");
+
             go.disabled = false;
             clr.disabled = false;
 
@@ -341,38 +415,74 @@ const CG = {
             `;
         };
 
+        // ---------------------------------------------
+        // OPEN FILE PICKER
+        // ---------------------------------------------
+
         if (drop.tagName.toLowerCase() !== "label") {
-            drop.addEventListener("click", () => input.click());
+            drop.addEventListener("click", () => {
+                input.click();
+            });
         }
 
         input.addEventListener("change", () => {
+
             if (input.files && input.files.length > 0) {
                 load(input.files[0]);
             }
+
         });
+
+        // ---------------------------------------------
+        // CLEAR BUTTON
+        // ---------------------------------------------
 
         clr.addEventListener("click", reset);
 
+        // ---------------------------------------------
+        // DRAG AND DROP
+        // ---------------------------------------------
+
         ["dragenter", "dragover"].forEach(eventName => {
+
             drop.addEventListener(eventName, event => {
+
                 event.preventDefault();
+
                 drop.classList.add("drag");
+
             });
+
         });
 
         ["dragleave", "drop"].forEach(eventName => {
+
             drop.addEventListener(eventName, event => {
+
                 event.preventDefault();
+
                 drop.classList.remove("drag");
+
             });
+
         });
 
         drop.addEventListener("drop", event => {
+
             const file = event.dataTransfer.files[0];
-            if (file) load(file);
+
+            if (file) {
+                load(file);
+            }
+
         });
 
+        // ---------------------------------------------
+        // ANALYZE LEAF
+        // ---------------------------------------------
+
         go.addEventListener("click", async () => {
+
             if (!selectedFile) return;
 
             go.disabled = true;
@@ -387,7 +497,9 @@ const CG = {
             `;
 
             try {
+
                 const formData = new FormData();
+
                 formData.append("image", selectedFile);
 
                 const response = await fetch(
@@ -403,7 +515,7 @@ const CG = {
                 try {
                     result = await response.json();
                 } catch (error) {
-                    throw new Error("Backend returned an invalid response.");
+                    throw new Error("Invalid response from backend.");
                 }
 
                 if (!response.ok) {
@@ -418,50 +530,67 @@ const CG = {
 
                 const statusColor =
                     confidence < 60 ? "danger" :
-                    confidence < 80 ? "warning" : "success";
+                    confidence < 80 ? "warning" :
+                    "success";
+
+                // -------------------------------------
+                // DISPLAY RESULT
+                // -------------------------------------
 
                 box.innerHTML = `
                     <h5 class="text-success mb-3">
                         <i class="bi bi-activity"></i>
                         AI Detection Result
                     </h5>
+
                     <div class="alert alert-${statusColor}">
-                        <strong id="cgDisease"></strong><br>
+                        <strong id="cgDisease"></strong>
+                        <br>
                         <span id="cgCondition"></span>
                     </div>
+
                     <div class="cg-result-item">
                         <strong>Model confidence</strong>
                         <p id="cgConfidence"></p>
                     </div>
+
                     <div class="cg-result-item">
                         <strong>Confidence status</strong>
                         <p id="cgStatus"></p>
                     </div>
+
                     <div class="alert alert-${statusColor}">
                         <strong>Diagnosis warning</strong>
                         <p id="cgWarning" class="mb-0"></p>
                     </div>
+
                     <div class="cg-result-item">
                         <strong>Severity</strong>
                         <p id="cgSeverity"></p>
                     </div>
+
                     <div class="cg-result-item">
                         <strong>Symptoms</strong>
                         <p id="cgSymptoms"></p>
                     </div>
+
                     <div class="cg-result-item">
                         <strong>Treatment</strong>
                         <p id="cgTreatment"></p>
                     </div>
+
                     <div class="cg-result-item">
                         <strong>Chemical recommendation</strong>
                         <p id="cgChemical"></p>
                     </div>
+
                     <div class="cg-result-item">
                         <strong>Prevention</strong>
                         <p id="cgPrevention"></p>
                     </div>
+
                     <hr>
+
                     <small class="text-muted">
                         AI predictions are guidance, not a guaranteed diagnosis.
                         Confirm with a local agricultural expert before applying pesticides.
@@ -469,10 +598,13 @@ const CG = {
                 `;
 
                 const setText = (id, value) => {
+
                     const element = document.getElementById(id);
+
                     if (element) {
                         element.textContent = value || "Not available";
                     }
+
                 };
 
                 setText("cgDisease", result.crop_disease || result.disease);
@@ -486,27 +618,36 @@ const CG = {
                 setText("cgChemical", result.chemical_recommendation);
                 setText("cgPrevention", result.prevention);
 
+                // -------------------------------------
+                // SAVE PREDICTION TO FARMER HISTORY
+                // -------------------------------------
+
                 if (CG.session.token()) {
+
                     try {
+
                         const rawLabel = String(
                             result.crop_disease || result.disease || ""
                         ).trim();
 
                         const supportedCrops = [
-                            "Tomato", "Potato", "Pepper",
-                            "Corn", "Apple", "Grape"
+                            "Tomato",
+                            "Potato",
+                            "Pepper",
+                            "Corn",
+                            "Apple",
+                            "Grape"
                         ];
 
-                        let crop = supportedCrops.find(name =>
-                            name.toLowerCase() ===
-                            String(result.crop || "").trim().toLowerCase()
+                        let crop = supportedCrops.find(
+                            name => name.toLowerCase() ===
+                                String(result.crop || "").trim().toLowerCase()
                         );
 
                         if (!crop) {
                             crop = supportedCrops.find(name =>
-                                new RegExp(
-                                    "^" + name + "(?:[_\\s-]|$)", "i"
-                                ).test(rawLabel)
+                                new RegExp("^" + name + "(?:[_\\s-]|$)", "i")
+                                    .test(rawLabel)
                             );
                         }
 
@@ -540,8 +681,8 @@ const CG = {
                             method: "POST",
                             auth: true,
                             body: {
-                                crop,
-                                disease,
+                                crop: crop,
+                                disease: disease,
                                 confidence: confidence / 100,
                                 notes: String(result.symptoms || "").slice(0, 500)
                             }
@@ -552,48 +693,68 @@ const CG = {
                         savedMessage.textContent =
                             "Farm record saved successfully. Record ID: " +
                             saved.detection.id;
+
                         box.appendChild(savedMessage);
 
                     } catch (saveError) {
+
                         const saveMessage = document.createElement("div");
                         saveMessage.className = "alert alert-warning mt-3";
                         saveMessage.textContent =
                             "AI prediction succeeded, but saving the farm record failed: " +
                             saveError.message;
+
                         box.appendChild(saveMessage);
                     }
+
                 } else {
+
                     const loginMessage = document.createElement("div");
                     loginMessage.className = "alert alert-info mt-3";
                     loginMessage.textContent =
                         "Log in to save this detection to your farm history.";
+
                     box.appendChild(loginMessage);
                 }
 
             } catch (error) {
+
                 box.innerHTML = `
                     <div class="alert alert-danger">
                         <h5>Prediction failed</h5>
                         <p id="cgError"></p>
                     </div>
                 `;
-                document.getElementById("cgError").textContent = error.message;
+
+                document.getElementById("cgError").textContent =
+                    error.message;
 
             } finally {
+
                 go.disabled = !selectedFile;
                 clr.disabled = !selectedFile;
+
             }
+
         });
+
     },
 
+    // =================================================
+    // DETECTION HISTORY
+    // =================================================
+
     async history() {
+
         if (!CG.requireLogin()) return;
 
         const body = document.getElementById("historyBody");
         const empty = document.getElementById("historyEmpty");
+
         if (!body || !empty) return;
 
         try {
+
             const result = await CG.api(
                 "/detections?per_page=50",
                 { auth: true }
@@ -602,33 +763,40 @@ const CG = {
             body.innerHTML = "";
 
             result.detections.forEach(detection => {
+
                 const tr = document.createElement("tr");
-                const rawDate = String(detection.created_at || "");
-                const parsedDate = new Date(
-                    rawDate.replace(" ", "T") + "Z"
-                );
-                const date = Number.isNaN(parsedDate.getTime())
-                    ? rawDate
-                    : parsedDate.toLocaleString();
+
+                const date = new Date(
+                    detection.created_at.replace(" ", "T") + "Z"
+                ).toLocaleString();
 
                 [
                     date,
                     detection.crop,
                     detection.disease,
-                    Math.round(Number(detection.confidence) * 100) + "%",
+                    Math.round(detection.confidence * 100) + "%",
                     detection.blockchain_tx ? "Registered" : "Not registered"
                 ].forEach(value => {
+
                     const td = document.createElement("td");
-                    td.textContent = value ?? "";
+
+                    td.textContent = value;
+
                     tr.appendChild(td);
+
                 });
 
                 body.appendChild(tr);
+
             });
 
-            empty.classList.toggle("d-none", result.detections.length > 0);
+            empty.classList.toggle(
+                "d-none",
+                result.detections.length > 0
+            );
 
         } catch (error) {
+
             if (error.status === 401) {
                 window.location.replace("login.html");
                 return;
@@ -639,117 +807,44 @@ const CG = {
 
             if (heading) heading.textContent = "Could not load history";
             if (paragraph) paragraph.textContent = error.message;
+
         }
+
     },
 
-    async dashboard() {
-        if (!CG.requireLogin()) return;
+    // =================================================
+    // BLOCKCHAIN VERIFICATION PLACEHOLDER
+    // =================================================
 
-        const message = document.getElementById("dashboardMessage");
-        const totalLeaves = document.getElementById("totalLeaves");
-        const healthyResults = document.getElementById("healthyResults");
-        const diseasesFound = document.getElementById("diseasesFound");
-        const blockchainRecords = document.getElementById("blockchainRecords");
-        const recentEmpty = document.getElementById("recentEmpty");
-        const recentTableWrap = document.getElementById("recentTableWrap");
-        const recentBody = document.getElementById("recentBody");
+    verify(formId, outId) {
 
-        if (
-            !message || !totalLeaves || !healthyResults ||
-            !diseasesFound || !blockchainRecords ||
-            !recentEmpty || !recentTableWrap || !recentBody
-        ) {
-            console.error("CropGuard dashboard elements are missing.");
-            return;
-        }
+        const form = document.getElementById(formId);
+        const output = document.getElementById(outId);
 
-        try {
-            const result = await CG.api(
-                "/detections?per_page=100",
-                { auth: true }
-            );
+        if (!form || !output) return;
 
-            const detections = result.detections || [];
-            const total = Number(result.total ?? detections.length);
+        form.addEventListener("submit", event => {
 
-            const healthy = detections.filter(detection =>
-                String(detection.disease || "")
-                    .toLowerCase().includes("healthy")
-            ).length;
+            event.preventDefault();
 
-            const registered = detections.filter(detection =>
-                Boolean(detection.blockchain_tx)
-            ).length;
+            output.className = "alert alert-secondary";
 
-            totalLeaves.textContent = total;
-            healthyResults.textContent = healthy;
-            diseasesFound.textContent = Math.max(0, total - healthy);
-            blockchainRecords.textContent = registered;
+            output.textContent =
+                "Blockchain verification is not connected yet.";
 
-            recentBody.innerHTML = "";
+        });
 
-            if (detections.length === 0) {
-                recentEmpty.classList.remove("d-none");
-                recentTableWrap.classList.add("d-none");
-            } else {
-                recentEmpty.classList.add("d-none");
-                recentTableWrap.classList.remove("d-none");
-
-                detections.slice(0, 5).forEach(detection => {
-                    const tr = document.createElement("tr");
-                    const rawDate = String(detection.created_at || "");
-                    const parsedDate = new Date(
-                        rawDate.replace(" ", "T") + "Z"
-                    );
-                    const date = Number.isNaN(parsedDate.getTime())
-                        ? rawDate
-                        : parsedDate.toLocaleString();
-
-                    const values = [
-                        date,
-                        detection.crop || "",
-                        detection.disease || "",
-                        Math.round(Number(detection.confidence) * 100) + "%",
-                        detection.blockchain_tx ? "Registered" : "Not registered"
-                    ];
-
-                    values.forEach(value => {
-                        const td = document.createElement("td");
-                        td.textContent = value;
-                        tr.appendChild(td);
-                    });
-
-                    recentBody.appendChild(tr);
-                });
-            }
-
-            message.className = "alert alert-success";
-            message.textContent =
-                "Your farm dashboard is connected successfully.";
-
-        } catch (error) {
-            message.className = "alert alert-danger";
-            message.textContent =
-                "Could not load dashboard: " + error.message;
-
-            if (error.status === 401) {
-                CG.session.clear();
-                window.location.replace("login.html");
-            }
-        }
     }
+
 };
 
-// =====================================================
-// MAKE CROPGUARD AVAILABLE TO ALL PAGE SCRIPTS
-// =====================================================
-
-window.CG = CG;
 
 // =====================================================
 // PAGE INITIALIZATION
 // =====================================================
 
 document.addEventListener("DOMContentLoaded", () => {
+
     CG.navAuth();
+
 });
